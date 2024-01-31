@@ -2,29 +2,29 @@ version: '3.7'
 
 services:
 
-  rust-service-prod:
-    image: apwells/universal-bottle-tracker
+  universal-bottle-tracker:
+    image: apwells/universal-bottle-tracker:latest
     volumes:
       - type: bind
         source: /var/data/universal-bottle-tracker
         target: /database
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 1
       placement:
         constraints: [node.role == manager]
       labels:
         - "traefik.enable=true"
         - "traefik.docker.network=traefik_public"
-        - "traefik.http.routers.rust-service-prod.rule=Host(`bt2.alandstreetlab.uk`)"
-        - "traefik.http.routers.rust-service-prod.entrypoints=https"
-        - "traefik.http.services.rust-service-prod.loadbalancer.server.port=3000"
-        - "traefik.http.routers.rust-service-prod.tls.certresolver=lets-encrypt"
-        - "traefik.http.routers.rust-service-prod.tls=true"
-        - "traefik.http.routers.rust-service-prod.tls.domains[0].main=bt2.alandstreetlab.uk"
-        - "traefik.http.routers.rust-service-prod.tls.domains[0].sans=*.alandstreetlab.uk"
-        - "traefik.http.middlewares.rust-service-prod.ratelimit.average=10"
-        - "traefik.http.middlewares.rust-service-prod.ratelimit.burst=20"
+        - "traefik.http.routers.universal-bottle-tracker.rule=Host(`bt2.alandstreetlab.uk`)"
+        - "traefik.http.routers.universal-bottle-tracker.entrypoints=https"
+        - "traefik.http.services.universal-bottle-tracker.loadbalancer.server.port=3000"
+        - "traefik.http.routers.universal-bottle-tracker.tls.certresolver=lets-encrypt"
+        - "traefik.http.routers.universal-bottle-tracker.tls=true"
+        - "traefik.http.routers.universal-bottle-tracker.tls.domains[0].main=bt2.alandstreetlab.uk"
+        - "traefik.http.routers.universal-bottle-tracker.tls.domains[0].sans=*.alandstreetlab.uk"
+        - "traefik.http.middlewares.universal-bottle-tracker.ratelimit.average=10"
+        - "traefik.http.middlewares.universal-bottle-tracker.ratelimit.burst=20"
 
     networks:
       - traefik_public
