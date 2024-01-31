@@ -1,0 +1,34 @@
+version: '3.7'
+
+services:
+
+  rust-service-prod:
+    image: apwells/universal-bottle-tracker
+    volumes:
+      - type: bind
+        source: /var/data/universal-bottle-tracker
+        target: /database
+    deploy:
+      mode: replicated
+      replicas: 3
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_public"
+        - "traefik.http.routers.rust-service-prod.rule=Host(`bt2.alandstreetlab.uk`)"
+        - "traefik.http.routers.rust-service-prod.entrypoints=https"
+        - "traefik.http.services.rust-service-prod.loadbalancer.server.port=3000"
+        - "traefik.http.routers.rust-service-prod.tls.certresolver=lets-encrypt"
+        - "traefik.http.routers.rust-service-prod.tls=true"
+        - "traefik.http.routers.rust-service-prod.tls.domains[0].main=bt2.alandstreetlab.uk"
+        - "traefik.http.routers.rust-service-prod.tls.domains[0].sans=*.alandstreetlab.uk"
+        - "traefik.http.middlewares.rust-service-prod.ratelimit.average=10"
+        - "traefik.http.middlewares.rust-service-prod.ratelimit.burst=20"
+
+    networks:
+      - traefik_public
+
+networks:
+  traefik_public:
+    external: true
