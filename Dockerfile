@@ -19,7 +19,7 @@ RUN apt-get upgrade -y
 RUN apt-get install -y curl
 RUN apt-get install -y extra-runtime-dependencies pkg-config & apt-get clean & rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/local/cargo/bin/universal-bottle-tracker /usr/local/bin/universal-bottle-tracker
-COPY --from=builder /usr/src/rustservice/web/dist /static
+COPY --from=builder /usr/src/rustservice/web/dist/spa /static
 EXPOSE 3000
 HEALTHCHECK --start-period=60s  CMD curl --fail http://localhost:3000/health || exit 1
 CMD ["universal-bottle-tracker"]
