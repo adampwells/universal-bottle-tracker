@@ -1,20 +1,37 @@
 {
   "name": "web",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "description": "Track home brew bottles using QR coded labels",
+  "productName": "Universal Bottle Tracker",
+  "author": "adam <adam@alandstreet.com>",
   "private": true,
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "lint": "eslint --ext .js,.vue ./",
+    "format": "prettier --write \"**/*.{js,vue,scss,html,md,json}\" --ignore-path .gitignore",
+    "test": "echo \"No test specified\" && exit 0",
+    "dev": "quasar dev",
+    "build": "quasar build"
   },
   "dependencies": {
-    "vue": "^3.4.15",
-    "vue-router": "^4.2.5",
+    "axios": "^1.2.1",
+    "@quasar/extras": "^1.16.4",
+    "quasar": "^2.8.0",
+    "vue": "^3.2.29",
+    "vue-router": "^4.0.12",
     "vue-qrcode-reader": "^5.5.1"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.3",
-    "vite": "^5.0.11"
+    "eslint": "^8.11.0",
+    "eslint-plugin-vue": "^9.0.0",
+    "eslint-config-prettier": "^8.1.0",
+    "prettier": "^2.5.1",
+    "@quasar/app-vite": "^1.4.3",
+    "autoprefixer": "^10.4.2",
+    "postcss": "^8.4.14"
+  },
+  "engines": {
+    "node": "^20 || ^18 || ^16",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
   }
 }

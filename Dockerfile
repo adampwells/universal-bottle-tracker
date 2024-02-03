@@ -6,9 +6,10 @@ RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
     apt-get install -y nodejs \
     build-essential && \
     node --version && \
-    npm --version
+    npm --version \
+RUN npm i -g @quasar/cli
 RUN cargo install --path .
-RUN cd /usr/src/rustservice/web && npm install && npm run build
+RUN cd /usr/src/rustservice/web && npm install && quasar build
 
 FROM debian:bullseye-slim
 RUN apt-get update
