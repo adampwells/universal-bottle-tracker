@@ -2,14 +2,16 @@ FROM rust:1.75-bullseye as builder
 WORKDIR /usr/src/rustservice
 COPY . .
 RUN apt-get install -y curl
-RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs \
     build-essential && \
     node --version && \
     npm --version \
+RUN npm i -g quasar
 RUN npm i -g @quasar/cli
-RUN cargo install --path .
 RUN cd /usr/src/rustservice/web && npm install && quasar build
+RUN cd /usr/src/rustservice
+RUN cargo install --path .
 
 FROM debian:bullseye-slim
 RUN apt-get update

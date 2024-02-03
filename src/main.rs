@@ -32,8 +32,8 @@ async fn main() {
 
     // build our application with a route
     let app = Router::new()
-        .route("/bottle/:bottle_id", get(find_bottle_data))
-        .route("/bottle", put(save_bottle_data))
+        .route("/api/bottle/:bottle_id", get(find_bottle_data))
+        .route("/api/bottle", put(save_bottle_data))
         .route("/health", get(health_check))
         .nest_service("/", ServeDir::new("static"))
         .with_state(pool);
