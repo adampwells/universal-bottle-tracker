@@ -11,7 +11,7 @@ use serde_json::Value;
 use sqlx::sqlite::SqliteQueryResult;
 use sqlx::{Sqlite, SqlitePool};
 use sqlx::migrate::MigrateDatabase;
-use tower_http::services::{ServeDir, ServeFile};
+use tower_http::services::ServeDir;
 use tracing::debug;
 use crate::error_wrapper::AppError;
 
@@ -20,7 +20,7 @@ async fn main() {
     // initialize tracing
     tracing_subscriber::fmt::init();
 
-    let db_url = String::from("sqlite://database/sqlite.db");
+    let db_url = String::from("sqlite://sqlite.db");
     if !Sqlite::database_exists(&db_url).await.unwrap_or(false) {
         Sqlite::create_database(&db_url).await.unwrap();
         match create_schema(&db_url).await {
@@ -32,7 +32,7 @@ async fn main() {
 
     // build our application with a route
     let app = Router::new()
-        .route("/api/bottle/:bottle_id", get(find_bottle_data))
+        .route("/api/bottle/:bottle_id", get(get_or_create_bottle))
         .route("/api/bottle", put(save_bottle_data))
         .route("/health", get(health_check))
         .nest_service("/", ServeDir::new("static"))
@@ -44,7 +44,7 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-#[derive(Serialize, Deserialize, sqlx::FromRow)]
+#[derive(Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Bottle {
     bottle_id: String,
     batch_id: String,
@@ -54,14 +54,54 @@ pub struct Bottle {
     saved_date: Option<NaiveDateTime>,
 }
 
-pub async fn find_bottle_data(State(pool): State<SqlitePool>, Path(bottle_id): Path<String>) -> Result<Json<Value>, AppError> {
+pub async fn get_or_create_bottle(State(pool): State<SqlitePool>, Path(bottle_id): Path<String>) -> Result<Json<Value>, AppError> {
+
+    let bottles = sqlx::query_as!(
+        Bottle,
+        "SELECT * FROM bottles WHERE bottle_id = ?",
+        bottle_id)
+            .fetch_all(&pool)
+            .await?;
+
+    let bottle: Bottle;
+
+    if bottles.len() == 0 {
+        bottle = Bottle {
+            bottle_id: bottle_id.clone(),
+            batch_id: String::from(""),
+            batch_name: String::from(""),
+            batch_description: String::from(""),
+            saved_by: String::from(""),
+            saved_date: Some(NaiveDateTime::default()),
+        };
+        save_bottle(&pool, &bottle).await?;
+    } else {
+        bottle = bottles[0].clone();
+    }
+
     let json_payload = serde_json::json!({
         "message": format!("data for bottle {}", bottle_id),
+        "data": bottle
     });
     Ok(Json(json_payload))
 }
 
+async fn save_bottle(pool: &SqlitePool, bottle: &Bottle) -> Result<SqliteQueryResult, sqlx::Error> {
+    let result = sqlx::query(
+        "INSERT INTO bottles (bottle_id, batch_id, batch_name, batch_description, saved_by) VALUES (?, ?, ?, ?, ?)",
+    )
+    .bind(&bottle.bottle_id)
+    .bind(&bottle.batch_id)
+    .bind(&bottle.batch_name)
+    .bind(&bottle.batch_description)
+    .bind(&bottle.saved_by)
+    .execute(pool)
+    .await;
+    return result;
+}
+
 pub async fn save_bottle_data(State(pool): State<SqlitePool>, Json(bottle): Json<Bottle>) -> Result<Json<Value>, AppError> {
+    save_bottle(&pool, &bottle).await?;
     let json_payload = serde_json::json!({
         "message": format!("saved a bottle with id {}", bottle.bottle_id),
     });

@@ -1,0 +1,1 @@
+import{Q as e}from"./QPage.ed9669d4.js";import{_ as t,O as a,C as o,D as r,E as s,G as c}from"./index.337f03b4.js";import"./render.a42eb5c9.js";const n=a({name:"AboutPage"});function f(p,_,i,l,m,u){return o(),r(e,{class:"flex flex-center"},{default:s(()=>[c(" bottaboutle ")]),_:1})}var $=t(n,[["render",f]]);export{$ as default};
