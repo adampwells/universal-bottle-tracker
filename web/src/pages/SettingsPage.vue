@@ -1,18 +1,34 @@
 <template>
   <q-page class="flex flex-center">
     <div class="q-pa-md">
+      <h4>Brewfather API Key</h4>
       <p>These credentials are stored locally on this browser only.</p>
-        <div class="row q-gutter-md">
-          <div class="col-12">
-            <q-input v-model="brewFatherId" label="Brewfather ID" @blur="saveCredentials"/>
-          </div>
-          <div class="col-12">
-            <q-input type="password" v-model="brewFatherKey" label="Brewfather Key" @blur="saveCredentials"/>
-          </div>
-          <div class="col-12">
-            <q-btn size="sm" label="Load Batches" @click="loadBatches"/>
-          </div>
+      <div class="row q-gutter-md">
+        <div class="col-12">
+          <q-input v-model="brewFatherId" label="Brewfather User ID" @blur="saveCredentials"/>
         </div>
+        <div class="col-12">
+          <q-input type="password" v-model="brewFatherKey" label="Brewfather API Key" @blur="saveCredentials"/>
+        </div>
+        <div class="col-12">
+          <q-btn size="sm" label="Load Batches" @click="loadBatches"/>
+        </div>
+      </div>
+      <h4>How do I get my User ID and API Key?</h4>
+      <div class="row q-gutter-y-lg">
+        <q-card class="col-8" bordered>
+          <q-img src="/IMG_1658.PNG" fit="contain"/>
+        </q-card>
+        <q-card class="col-8" bordered>
+          <q-img src="/IMG_1659.PNG" fit="contain"/>
+        </q-card>
+        <q-card class="col-8" bordered>
+          <q-img src="/IMG_1660.PNG" fit="contain"/>
+        </q-card>
+        <q-card class="col-8" bordered>
+          <q-img src="/IMG_1661.PNG" fit="contain"/>
+        </q-card>
+      </div>
     </div>
   </q-page>
 </template>

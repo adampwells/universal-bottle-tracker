@@ -26,7 +26,7 @@ async fn main() {
     // initialize tracing
     tracing_subscriber::fmt::init();
 
-    let db_url = String::from("sqlite://sqlite.db");
+    let db_url = String::from("sqlite://database/sqlite.db");
     if !Sqlite::database_exists(&db_url).await.unwrap_or(false) {
         Sqlite::create_database(&db_url).await.unwrap();
         match create_schema(&db_url).await {
