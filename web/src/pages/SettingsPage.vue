@@ -1,7 +1,7 @@
 <template>
   <q-page class="flex flex-center">
     <div class="q-pa-md">
-      <h4>Brewfather API Key</h4>
+      <h6>Brewfather API Key</h6>
       <p>These credentials are stored locally on this browser only.</p>
       <div class="row q-gutter-md">
         <div class="col-12">
@@ -14,8 +14,8 @@
           <q-btn size="sm" label="Load Batches" @click="loadBatches"/>
         </div>
       </div>
-      <h4>How do I get my User ID and API Key?</h4>
-      <div class="row q-gutter-y-lg">
+      <h6>How do I get my User ID and API Key?</h6>
+      <div class="row q-gutter-y-lg justify-around">
         <q-card class="col-8" bordered>
           <q-img src="/IMG_1658.PNG" fit="contain"/>
         </q-card>
@@ -35,7 +35,7 @@
 
 <script setup>
 import {onMounted, ref} from "vue";
-
+import { useQuasar } from 'quasar'
 import api from "src/js/brewfather.js"
 
 let brewFatherKey = ref('')
@@ -48,6 +48,15 @@ onMounted(() => {
     }
 )
 
+const $q = useQuasar()
+
+function showNotify (message, type) {
+  $q.notify({
+    message: message,
+    type: type
+  })
+}
+
 function saveCredentials() {
   console.log('Saving Brewfather Credentials')
   localStorage.setItem('brewfatherKey', brewFatherKey.value)
@@ -56,7 +65,9 @@ function saveCredentials() {
 
 async function loadBatches() {
   api.getConditioningBatches().then((data) => {
-    console.log(data)
+    showNotify('Loaded ' + data.length + ' batches', 'positive')
+  }).catch((error) => {
+    showNotify('Error loading batches', 'negative')
   })
 }
 
