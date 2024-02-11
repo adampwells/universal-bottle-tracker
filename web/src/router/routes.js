@@ -3,10 +3,10 @@ const routes = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    redirect: '/bottle',
+    redirect: '/b',
     children: [
-      { path: '/bottle/:bottleId', component: () => import('pages/BottlePage.vue') },
-      { path: '/bottle', component: () => import('pages/BottlePage.vue') },
+      { path: '/b/:bottleId', component: () => import('pages/BottlePage.vue') },
+      { path: '/b', component: () => import('pages/BottlePage.vue') },
       { path: '/settings', component: () => import('pages/SettingsPage.vue') },
       { path: '/about', component: () => import('pages/AboutPage.vue') },
     ]

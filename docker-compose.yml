@@ -16,13 +16,12 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.docker.network=traefik_public"
-        - "traefik.http.routers.universal-bottle-tracker.rule=Host(`bt2.alandstreetlab.uk`)"
+        - "traefik.http.routers.universal-bottle-tracker.rule=Host(`app.wht1.au`)"
         - "traefik.http.routers.universal-bottle-tracker.entrypoints=https"
         - "traefik.http.services.universal-bottle-tracker.loadbalancer.server.port=3000"
-        - "traefik.http.routers.universal-bottle-tracker.tls.certresolver=lets-encrypt"
+        - "traefik.http.routers.universal-bottle-tracker.tls.certresolver=lets-encrypt_2"
         - "traefik.http.routers.universal-bottle-tracker.tls=true"
-        - "traefik.http.routers.universal-bottle-tracker.tls.domains[0].main=bt2.alandstreetlab.uk"
-        - "traefik.http.routers.universal-bottle-tracker.tls.domains[0].sans=*.alandstreetlab.uk"
+        - "traefik.http.routers.universal-bottle-tracker.tls.domains[0].main=app.wht1.au"
         - "traefik.http.middlewares.universal-bottle-tracker.ratelimit.average=10"
         - "traefik.http.middlewares.universal-bottle-tracker.ratelimit.burst=20"
 

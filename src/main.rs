@@ -1,11 +1,16 @@
 mod error_wrapper;
+mod labels;
 
 use axum::{
     routing::{get, put},
     Json, Router,
 };
+use axum::body::Body;
 use axum::extract::{Path, State};
+use axum::http::header;
+use axum::response::{IntoResponse, Response};
 use chrono::NaiveDateTime;
+use nanoid::nanoid;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::sqlite::SqliteQueryResult;
@@ -14,6 +19,7 @@ use sqlx::migrate::MigrateDatabase;
 use tower_http::services::ServeDir;
 use tracing::debug;
 use crate::error_wrapper::AppError;
+use crate::labels::get_label_docx;
 
 #[tokio::main]
 async fn main() {
@@ -35,6 +41,7 @@ async fn main() {
         .route("/api/bottle/:bottle_id", get(get_or_create_bottle))
         .route("/api/bottle", put(save_bottle_data))
         .route("/health", get(health_check))
+        .route("/labels", get(get_label_doc))
         .nest_service("/", ServeDir::new("static"))
         .with_state(pool);
 
@@ -84,6 +91,19 @@ pub async fn get_or_create_bottle(State(pool): State<SqlitePool>, Path(bottle_id
         "data": bottle
     });
     Ok(Json(json_payload))
+}
+
+pub async fn get_label_doc() -> Result<Response, AppError> {
+
+    let bytes = get_label_docx().await?;
+    let body = Body::from(bytes);
+
+    let headers = [
+        (header::CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+        (header::CONTENT_DISPOSITION,  &format!("attachment; filename=\"bottle_labels_{}\".docx", nanoid!())),
+    ];
+
+    Ok((headers, body).into_response())
 }
 
 async fn save_bottle(pool: &SqlitePool, bottle: &Bottle) -> Result<SqliteQueryResult, sqlx::Error> {
