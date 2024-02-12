@@ -7,7 +7,7 @@
       <q-card-section>
         <div class="row justify-center">
           <div class="col-12"  v-if="currentBottle">
-            <q-select label="Choose Batch" :options="batches" v-model="currentBottle.batch_id" map-options emit-value @update:model-value="updateBottle"/>
+            <q-select label="Choose Batch" :options="batches" v-model="selectedBatch" map-options emit-value @update:model-value="updateBottle" style="width: 200px"/>
           </div>
         </div>
       </q-card-section>
@@ -41,7 +41,7 @@ export default defineComponent({
       saved_by: undefined,
     }
     const currentBottle = ref(undefined);
-    const selectedBatch = ref('empty bottle');
+    const selectedBatch = ref(undefined);
     let brewFatherKey = ref('')
     let brewFatherId = ref('')
 
@@ -60,18 +60,32 @@ export default defineComponent({
       showNotify('Got it!', 'positive')
       let value = res[0].rawValue.split('/');
       scannedBottleId.value = value[value.length - 1];
+      console.log('Scanned Bottle ID: ' + scannedBottleId.value)
       await getOrCreateBottle(scannedBottleId.value)
     };
 
     const getOrCreateBottle = async (bottleId) => {
-      let bottle = await api.getOrCreateBottle(bottleId)
-      if (bottle) {
-        currentBottle.value = bottle
+      let response = await api.getOrCreateBottle(bottleId)
+      if (response.data) {
+        currentBottle.value = response.data
+        if (currentBottle.value.batch_id) {
+          let value = batches.value.find(b => Number(b.value.batchNo) === Number(currentBottle.value.batch_id));
+          console.log(`bottle has a batch [${value.label}]`)
+          selectedBatch.value = value
+        } else {
+          console.log('bottle has no batch')
+          selectedBatch.value = undefined
+        }
       }
     }
 
     const updateBottle = async () => {
-      await api.updateBottle(currentBottle.value)
+      currentBottle.value.batch_id = `${selectedBatch.value.batchNo}`
+      currentBottle.value.saved_by = selectedBatch.value.brewer
+      currentBottle.value.batch_name = '#' + selectedBatch.value.batchNo + ' ' + selectedBatch.value.recipe.name + ' (' + selectedBatch.value.measuredAbv + '% ABV)'
+      await api.updateBottle(currentBottle.value).catch((error) => {
+        console.log(JSON.stringify(error))
+      })
     }
 
     onMounted(() => {
@@ -81,7 +95,7 @@ export default defineComponent({
             api.getConditioningBatches().then((data) => {
               batches.value = data.map(bb => {
                 return {
-                  value: bb._id,
+                  value: bb,
                   label: '#' + bb.batchNo + ' ' + bb.recipe.name + ' (' + bb.measuredAbv + '% ABV)',
                   batchNo: Number(bb.batchNo),
                 }
