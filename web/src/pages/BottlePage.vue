@@ -1,13 +1,24 @@
 <template>
   <q-page class="flex flex-center">
-    <div>
+    <div class="q-pa-md q-gutter-lg justify-center">
+      <q-card v-if="selectedBatch" class="bg-blue-1">
+        <q-card-section>
+          <div class="text-h6">{{selectedBatch.value.recipe.name}}</div>
+          <div class="text-subtitle2">{{selectedBatch.value.brewer}}</div>
+        </q-card-section>
+        <q-card-section>
+          <div class="text">Batch: {{selectedBatch.batchNo}}</div>
+          <div class="text">ABV: {{selectedBatch.value.measuredAbv}}%</div>
+          <div class="text">Conditioning for {{selectedBatch.conditioning}}</div>
+        </q-card-section>
+      </q-card>
       <div class="container-sm" style="max-width: 150px">
         <qrcode-stream @detect="onDetect"></qrcode-stream>
       </div>
       <q-card-section>
         <div class="row justify-center">
           <div class="col-12"  v-if="currentBottle">
-            <q-select label="Choose Batch" :options="batches" v-model="selectedBatch" map-options emit-value @update:model-value="updateBottle" style="width: 200px"/>
+            <q-select label="Choose Batch" :options="batches" v-model="selectedBatch" map-options emit-value @update:model-value="updateBottle" style="width: 300px"/>
           </div>
         </div>
       </q-card-section>
@@ -67,15 +78,14 @@ export default defineComponent({
     const getOrCreateBottle = async (bottleId) => {
       let response = await api.getOrCreateBottle(bottleId)
       if (response.data) {
-        currentBottle.value = response.data
-        if (currentBottle.value.batch_id) {
-          let value = batches.value.find(b => Number(b.value.batchNo) === Number(currentBottle.value.batch_id));
-          console.log(`bottle has a batch [${value.label}]`)
+        if (response.data.batch_id) {
+          let value = batches.value.find(b => Number(b.value.batchNo) === Number(response.data.batch_id));
           selectedBatch.value = value
         } else {
           console.log('bottle has no batch')
           selectedBatch.value = undefined
         }
+        currentBottle.value = response.data
       }
     }
 
@@ -94,10 +104,14 @@ export default defineComponent({
           if (brewFatherKey.value && brewFatherId.value) {
             api.getConditioningBatches().then((data) => {
               batches.value = data.map(bb => {
+                const bottlingDate = new Date(bb.bottlingDate)
+                const conditioning = Math.trunc((new Date().getTime() - bb.bottlingDate) / (60*60*24*1000)) + ' days'
+                console.log('Conditioning: ' + conditioning)
                 return {
                   value: bb,
                   label: '#' + bb.batchNo + ' ' + bb.recipe.name + ' (' + bb.measuredAbv + '% ABV)',
                   batchNo: Number(bb.batchNo),
+                  conditioning: conditioning
                 }
               });
               batches.value.sort((a, b) => a.batchNo > b.batchNo ? -1 : a.batchNo < b.batchNo ? 1 : 0)

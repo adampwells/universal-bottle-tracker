@@ -6,7 +6,7 @@ export default {
         let headers = new Headers();
         headers.set('Authorization', 'Basic ' + window.btoa(brewfatherId + ":" + brewfatherKey));
 
-        const response = await fetch('https://api.brewfather.app/v2/batches?status=Conditioning&limit=50&include=measuredAbv&order_by=batchNo&order_by_direction=desc', {
+        const response = await fetch('https://api.brewfather.app/v2/batches?status=Conditioning&limit=50&include=measuredAbv,bottlingDate&order_by=batchNo&order_by_direction=desc', {
             method:'GET',
             mode: 'cors',
             redirect: 'follow',

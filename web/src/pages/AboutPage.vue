@@ -20,7 +20,7 @@
               <q-item-label>
                 If my friend scans one of my bottles, do they get access to my Brewfather account?
               </q-item-label>
-              <q-item-label caption lines="2">
+              <q-item-label caption>
                 Absolutely not! The web app running on your phone is the only place the Brewfather credentials live, and only your device talks with Brewfather.
               </q-item-label>
             </q-item-section>
@@ -30,7 +30,7 @@
               <q-item-label>
                 Can someone just guess bottle identifiers and get info on what I am brewing?
               </q-item-label>
-              <q-item-label caption lines="2">
+              <q-item-label caption>
                 Good luck with that... the identifiers are globally unique and effectively un-guessable. Technically they are 128 bit globally unique identifiers using cryptographically strong random APIs
                 that guarantees a proper distribution of symbols.
               </q-item-label>
