@@ -12,7 +12,7 @@
       </q-toolbar>
 
       <q-tabs align="left">
-        <q-route-tab to="/bottle" label="Bottle Info" />
+        <q-route-tab to="/b" label="Bottle Info" />
         <q-route-tab to="/settings" label="Settings" />
         <q-route-tab to="/about" label="About" />
       </q-tabs>
