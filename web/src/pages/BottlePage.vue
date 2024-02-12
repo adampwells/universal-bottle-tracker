@@ -1,11 +1,8 @@
 <template>
   <q-page class="flex flex-center">
     <div>
-      <div class="container-sm" style="max-width: 300px">
+      <div class="container-sm" style="max-width: 150px">
         <qrcode-stream @detect="onDetect"></qrcode-stream>
-      </div>
-      <div>
-        <p>Scanned bottle id: {{ scannedBottleId }}</p>
       </div>
       <q-card-section>
         <div class="row justify-center">
@@ -21,6 +18,7 @@
 <script>
 import {defineComponent, onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
+import { useQuasar} from "quasar";
 import {QrcodeStream} from "vue-qrcode-reader";
 import api from "src/js/brewfather";
 
@@ -47,8 +45,19 @@ export default defineComponent({
     let brewFatherKey = ref('')
     let brewFatherId = ref('')
 
+    const $q = useQuasar()
+
+    function showNotify (message, type) {
+      $q.notify({
+        message: message,
+        type: type,
+        timeout: 50
+      })
+    }
+
     const onDetect = async (result) => {
       let res = await result
+      showNotify('Got it!', 'positive')
       let value = res[0].rawValue.split('/');
       scannedBottleId.value = value[value.length - 1];
       await getOrCreateBottle(scannedBottleId.value)
