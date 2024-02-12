@@ -1,6 +1,7 @@
 <template>
   <q-page class="flex flex-center">
     <div class="q-pa-md q-gutter-lg justify-center">
+      <h6>Scan a bottle QR code to get started</h6>
       <q-card v-if="selectedBatch" class="bg-blue-1">
         <q-card-section>
           <div class="text-h6">{{selectedBatch.value.recipe.name}}</div>
