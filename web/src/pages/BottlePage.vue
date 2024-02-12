@@ -91,6 +91,9 @@ export default defineComponent({
           } else {
             console.log('No Brewfather Credentials' + brewFatherKey.value + ' ' + brewFatherId.value)
           }
+          if (bottleId.value) {
+            getOrCreateBottle(bottleId.value)
+          }
         }
     )
 
