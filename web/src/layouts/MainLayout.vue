@@ -12,14 +12,16 @@
       </q-toolbar>
 
       <q-tabs align="left">
-        <q-route-tab to="/b" label="Bottle Info" />
-        <q-route-tab to="/settings" label="Settings" />
-        <q-route-tab to="/about" label="About" />
+        <q-route-tab to="/" label="Bottle Info"/>
+        <q-route-tab to="/settings" label="Settings"/>
+        <q-route-tab to="/about" label="About"/>
       </q-tabs>
     </q-header>
 
     <q-page-container>
-      <router-view />
+      <keep-alive>
+        <router-view/>
+      </keep-alive>
     </q-page-container>
 
   </q-layout>

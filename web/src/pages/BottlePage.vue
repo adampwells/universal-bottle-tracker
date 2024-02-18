@@ -1,24 +1,31 @@
 <template>
   <q-page class="flex flex-center">
     <div class="q-pa-md q-gutter-lg justify-center">
-      <h6>Scan a bottle QR code to get started</h6>
+      <h6 class="justify-center">Scan a bottle QR code to get started</h6>
       <q-card v-if="selectedBatch" class="bg-blue-1">
         <q-card-section>
-          <div class="text-h6">{{selectedBatch.value.recipe.name}}</div>
-          <div class="text-subtitle2">{{selectedBatch.value.brewer}}</div>
+          <div class="text-h6">{{ selectedBatch.value.recipe.name }}</div>
+          <div class="text-subtitle2">{{ selectedBatch.value.brewer }}</div>
         </q-card-section>
         <q-card-section>
-          <div class="text">Batch: {{selectedBatch.batchNo}}</div>
-          <div class="text">ABV: {{selectedBatch.value.measuredAbv}}%</div>
-          <div class="text">Conditioning for {{selectedBatch.conditioning}}</div>
+          <div class="text">Batch: {{ selectedBatch.batchNo }}</div>
+          <div class="text">ABV: {{ selectedBatch.value.measuredAbv }}%</div>
+          <div class="text">Conditioning for {{ selectedBatch.conditioning }}</div>
         </q-card-section>
       </q-card>
-      <div class="container-sm" style="max-width: 150px">
-        <qrcode-stream @detect="onDetect"></qrcode-stream>
+      <div class="row justify-center">
+        <div class="container-sm col-10" style="max-width: 150px">
+          <qrcode-stream @detect="onDetect"></qrcode-stream>
+        </div>
       </div>
       <q-card-section>
         <div class="row justify-center">
-          <div class="col-12"  v-if="currentBottle">
+          <div class="col-auto" v-if="currentBottle">
+            <div class="text-secondary">Scanned {{ currentBottle.bottle_id }}</div>
+          </div>
+        </div>
+        <div class="row justify-center">
+          <div class="col-auto" v-if="currentBottle">
             <q-select label="Choose Batch" :options="batches" v-model="selectedBatch" map-options emit-value @update:model-value="updateBottle" style="width: 300px"/>
           </div>
         </div>
@@ -30,7 +37,7 @@
 <script>
 import {defineComponent, onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import { useQuasar} from "quasar";
+import {useQuasar} from "quasar";
 import {QrcodeStream} from "vue-qrcode-reader";
 import api from "src/js/brewfather";
 
@@ -59,7 +66,7 @@ export default defineComponent({
 
     const $q = useQuasar()
 
-    function showNotify (message, type) {
+    function showNotify(message, type) {
       $q.notify({
         message: message,
         type: type,
@@ -106,7 +113,7 @@ export default defineComponent({
             api.getConditioningBatches().then((data) => {
               batches.value = data.map(bb => {
                 const bottlingDate = new Date(bb.bottlingDate)
-                const conditioning = Math.trunc((new Date().getTime() - bb.bottlingDate) / (60*60*24*1000)) + ' days'
+                const conditioning = Math.trunc((new Date().getTime() - bb.bottlingDate) / (60 * 60 * 24 * 1000)) + ' days'
                 console.log('Conditioning: ' + conditioning)
                 return {
                   value: bb,
@@ -120,11 +127,20 @@ export default defineComponent({
           } else {
             console.log('No Brewfather Credentials' + brewFatherKey.value + ' ' + brewFatherId.value)
           }
-          if (bottleId.value) {
-            getOrCreateBottle(bottleId.value)
-          }
+
+          lookupBottleIdFromQueryParams()
         }
     )
+
+    const lookupBottleIdFromQueryParams = async () => {
+      router.isReady().then(() => {
+        console.log('Query Params: ' + JSON.stringify(route.query))
+        if (route.query && route.query.b) {
+          bottleId.value = route.query.b
+          getOrCreateBottle(bottleId.value)
+        }
+      })
+    }
 
     return {
       batches,

@@ -3,10 +3,9 @@ const routes = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    redirect: '/b',
+    redirect: '/',
     children: [
-      { path: '/b/:bottleId', component: () => import('pages/BottlePage.vue') },
-      { path: '/b', component: () => import('pages/BottlePage.vue') },
+      { path: '/', component: () => import('pages/BottlePage.vue') },
       { path: '/settings', component: () => import('pages/SettingsPage.vue') },
       { path: '/about', component: () => import('pages/AboutPage.vue') },
     ]

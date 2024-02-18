@@ -55,7 +55,7 @@ pub async fn get_label_docx() -> Result<Vec<u8>, DocxError> {
 }
 
 fn generate_cell() -> TableCell {
-    let qr_code: Vec<u8> = qrcode_generator::to_png_to_vec(format!("https://app.wht1.au/b/{}", nanoid!()), QrCodeEcc::Low, 100).unwrap();
+    let qr_code: Vec<u8> = qrcode_generator::to_png_to_vec(format!("https://app.wht1.au/?b={}", nanoid!()), QrCodeEcc::Low, 100).unwrap();
     let qr_code = Pic::new(qr_code).size(100, 100);
     TableCell::new()
         .width(3686, WidthType::DXA)
