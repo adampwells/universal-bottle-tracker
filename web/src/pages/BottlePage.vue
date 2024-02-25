@@ -2,14 +2,14 @@
   <q-page class="flex flex-center">
     <div class="q-pa-md q-gutter-lg justify-center">
       <h6 class="justify-center">Scan a bottle QR code to get started</h6>
-      <q-card v-if="selectedBatch" class="bg-blue-1">
+      <q-card v-if="currentBottle" class="bg-blue-1">
         <q-card-section>
-          <div class="text-h6">{{ selectedBatch.value.recipe.name }}</div>
-          <div class="text-subtitle2">{{ selectedBatch.value.brewer }}</div>
+          <div class="text-h6">{{ currentBottle.batch_name }}</div>
+          <div class="text-subtitle2">{{ currentBottle.saved_by }}</div>
         </q-card-section>
-        <q-card-section>
+        <q-card-section v-if="selectedBatch">
           <div class="text">Batch: {{ selectedBatch.batchNo }}</div>
-          <div class="text">ABV: {{ selectedBatch.value.measuredAbv }}%</div>
+          <div class="text">ABV: {{ selectedBatch.measuredAbv }}%</div>
           <div class="text">Conditioning for {{ selectedBatch.conditioning }}</div>
         </q-card-section>
       </q-card>
@@ -21,11 +21,11 @@
       <q-card-section>
         <div class="row justify-center">
           <div class="col-auto" v-if="currentBottle">
-            <div class="text-secondary">Scanned {{ currentBottle.bottle_id }}</div>
+            <div class="text-secondary">Bottle Id {{ currentBottle.bottle_id }}</div>
           </div>
         </div>
         <div class="row justify-center">
-          <div class="col-auto" v-if="currentBottle">
+          <div class="col-auto" v-if="currentBottle && validCredentials">
             <q-select label="Choose Batch" :options="batches" v-model="selectedBatch" map-options emit-value @update:model-value="updateBottle" style="width: 300px"/>
           </div>
         </div>
@@ -61,6 +61,7 @@ export default defineComponent({
     }
     const currentBottle = ref(undefined);
     const selectedBatch = ref(undefined);
+    const validCredentials = ref(false);
     let brewFatherKey = ref('')
     let brewFatherId = ref('')
 
@@ -86,6 +87,8 @@ export default defineComponent({
     const getOrCreateBottle = async (bottleId) => {
       let response = await api.getOrCreateBottle(bottleId)
       if (response.data) {
+        console.log('Got Bottle: ' + JSON.stringify(response.data))
+        currentBottle.value = response.data
         if (response.data.batch_id) {
           let value = batches.value.find(b => Number(b.value.batchNo) === Number(response.data.batch_id));
           selectedBatch.value = value
@@ -93,7 +96,6 @@ export default defineComponent({
           console.log('bottle has no batch')
           selectedBatch.value = undefined
         }
-        currentBottle.value = response.data
       }
     }
 
@@ -111,6 +113,7 @@ export default defineComponent({
           brewFatherId.value = localStorage.getItem('brewfatherId')
           if (brewFatherKey.value && brewFatherId.value) {
             api.getConditioningBatches().then((data) => {
+              validCredentials.value = true
               batches.value = data.map(bb => {
                 const bottlingDate = new Date(bb.bottlingDate)
                 const conditioning = Math.trunc((new Date().getTime() - bb.bottlingDate) / (60 * 60 * 24 * 1000)) + ' days'
@@ -148,6 +151,7 @@ export default defineComponent({
       currentBottle,
       scannedBottleId,
       selectedBatch,
+      validCredentials,
       onDetect,
       updateBottle
     }

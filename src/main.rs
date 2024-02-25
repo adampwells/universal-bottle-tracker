@@ -5,6 +5,7 @@ use axum::{
 
 use sqlx::{Sqlite, SqlitePool};
 use sqlx::migrate::MigrateDatabase;
+use tower_http::cors::CorsLayer;
 use tower_http::services::ServeDir;
 use tracing::debug;
 
@@ -38,6 +39,7 @@ async fn main() {
         .route("/health", get(health_check))
         .route("/labels", get(get_label_doc))
         .nest_service("/", ServeDir::new("static"))
+        .layer(CorsLayer::permissive())
         .with_state(pool);
 
     // run our app with hyper, listening globally on port 3000

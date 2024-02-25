@@ -1,4 +1,9 @@
+var url = ''
+if (process.env.DEV) {
+    url = 'http://localhost:3000'
+}
 export default {
+
     async getConditioningBatches() {
 
         let brewfatherId = localStorage.getItem('brewfatherId');
@@ -19,7 +24,7 @@ export default {
 
     async getOrCreateBottle(bottleId) {
 
-        const response = await fetch(`/api/bottle/${bottleId}`, {
+        const response = await fetch(`${url}/api/bottle/${bottleId}`, {
             method:'GET',
             mode: 'cors',
             redirect: 'follow',
@@ -31,7 +36,7 @@ export default {
 
     async updateBottle(bottle) {
 
-        const response = await fetch(`/api/bottle`, {
+        const response = await fetch(`${url}/api/bottle`, {
             method:'PUT',
             mode: 'cors',
             redirect: 'follow',
