@@ -79,7 +79,16 @@ export default defineComponent({
       let res = await result
       showNotify('Got it!', 'positive')
       let value = res[0].rawValue.split('/');
-      scannedBottleId.value = value[value.length - 1];
+      if (value.length === 1) {
+        scannedBottleId.value = value[0];
+      } else {
+        value = value[value.length - 1];
+        if (value.indexOf('?b=') === -1) {
+          scannedBottleId.value = value;
+        } else {
+          scannedBottleId.value = value.substring(value.indexOf('?b=') + 3, value.length);
+        }
+      }
       console.log('Scanned Bottle ID: ' + scannedBottleId.value)
       await getOrCreateBottle(scannedBottleId.value)
     };
@@ -117,6 +126,7 @@ export default defineComponent({
               batches.value = data.map(bb => {
                 const bottlingDate = new Date(bb.bottlingDate)
                 const conditioning = Math.trunc((new Date().getTime() - bb.bottlingDate) / (60 * 60 * 24 * 1000)) + ' days'
+                bb.conditioning = conditioning
                 console.log('Conditioning: ' + conditioning)
                 return {
                   value: bb,
